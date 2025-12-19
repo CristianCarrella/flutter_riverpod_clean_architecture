@@ -39,11 +39,15 @@ class CustomLogger {
       lines.add("$_yellow⏳ |-> HEADERS: ${requestOptions.headers}");
     }
     if (requestOptions.queryParameters.isNotEmpty) {
-      lines.add("$_yellow⏳ |-> QUERY PARAMETERS: ${requestOptions.queryParameters}");
+      lines.add(
+        "$_yellow⏳ |-> QUERY PARAMETERS: ${requestOptions.queryParameters}",
+      );
     }
     if (requestOptions.data != null) {
       try {
-        lines.add("$_yellow⏳ |-> REQUEST BODY: ${jsonEncode(requestOptions.data)}");
+        lines.add(
+          "$_yellow⏳ |-> REQUEST BODY: ${jsonEncode(requestOptions.data)}",
+        );
       } catch (e) {
         lines.add("$_yellow⏳ |-> REQUEST BODY: ${requestOptions.data}");
       }
@@ -52,7 +56,11 @@ class CustomLogger {
     log(lines.join("\n"));
   }
 
-  String _truncateContent(dynamic data, {int maxChars = 500, int maxBytes = 20}) {
+  String _truncateContent(
+    dynamic data, {
+    int maxChars = 500,
+    int maxBytes = 20,
+  }) {
     if (data == null) return "null";
 
     if (data is List<int>) {

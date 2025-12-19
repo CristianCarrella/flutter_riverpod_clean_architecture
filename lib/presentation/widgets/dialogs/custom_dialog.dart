@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-enum DialogType { error, info, warning, ok }
+import 'custom_toast.dart';
 
 class CustomDialog {
   static void show(
     BuildContext context, {
-    required String title,
-    required String description,
+    String? title,
+    String? description,
     DialogType type = DialogType.info,
     String okText = "OK",
     String? cancelText,
@@ -31,18 +31,36 @@ class CustomDialog {
     );
   }
 
-  static void error(BuildContext context, {required String title, required String description}) {
-    show(context, title: title, description: description, type: DialogType.error);
+  static void error(
+    BuildContext context, {
+    required String title,
+    required String description,
+  }) {
+    show(
+      context,
+      title: title,
+      description: description,
+      type: DialogType.error,
+    );
   }
 
-  static void success(BuildContext context, {required String title, required String description}) {
-    show(context, title: title, description: description, type: DialogType.ok);
+  static void success(
+    BuildContext context, {
+    required String title,
+    required String description,
+  }) {
+    show(
+      context,
+      title: title,
+      description: description,
+      type: DialogType.success,
+    );
   }
 }
 
 class _CustomDialogWidget extends StatelessWidget {
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
   final DialogType type;
   final String okText;
   final String? cancelText;
@@ -67,8 +85,10 @@ class _CustomDialogWidget extends StatelessWidget {
         return Colors.blueAccent;
       case DialogType.warning:
         return Colors.orangeAccent;
-      case DialogType.ok:
+      case DialogType.success:
         return Colors.green;
+      case DialogType.none:
+        return Colors.transparent;
     }
   }
 
@@ -80,8 +100,10 @@ class _CustomDialogWidget extends StatelessWidget {
         return Icons.info_outline;
       case DialogType.warning:
         return Icons.warning_amber_rounded;
-      case DialogType.ok:
+      case DialogType.success:
         return Icons.check_circle_outline;
+      case DialogType.none:
+        return Icons.info_outline;
     }
   }
 
@@ -97,45 +119,70 @@ class _CustomDialogWidget extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.only(top: 60, bottom: 20, left: 20, right: 20),
+            padding: const EdgeInsets.only(
+              top: 60,
+              bottom: 20,
+              left: 20,
+              right: 20,
+            ),
             margin: const EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
-                BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 10)),
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 10),
+                ),
               ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
+                if (title != null)
+                  Text(
+                    title!,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 const SizedBox(height: 16),
-                Text(
-                  description,
-                  style: const TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
+                if (description != null)
+                  Text(
+                    description!,
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     if (cancelText != null)
                       TextButton(
-                        onPressed: onCancelPressed ?? () => Navigator.of(context).pop(),
-                        child: Text(cancelText!, style: TextStyle(color: Colors.grey[600])),
+                        onPressed:
+                            onCancelPressed ??
+                            () => Navigator.of(context).pop(),
+                        child: Text(
+                          cancelText!,
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-                      onPressed: onOkPressed ?? () => Navigator.of(context).pop(),
-                      child: Text(okText, style: const TextStyle(color: Colors.white)),
+                      onPressed:
+                          onOkPressed ?? () => Navigator.of(context).pop(),
+                      child: Text(
+                        okText,
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
                   ],
                 ),

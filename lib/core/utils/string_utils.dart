@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
 
-class StringUtil {
+class StringUtils {
+  StringUtils._();
+
   static bool isEmpty(String? str) {
     return str == null || str.isEmpty;
   }
@@ -122,7 +124,11 @@ class StringUtil {
     return emailRegExp.hasMatch(email);
   }
 
-  static String formatCurrency(double amount, {String symbol = '\$', String locale = 'en_US'}) {
+  static String formatCurrency(
+    double amount, {
+    String symbol = '\$',
+    String locale = 'en_US',
+  }) {
     return NumberFormat.currency(symbol: symbol, locale: locale).format(amount);
   }
 
@@ -165,7 +171,10 @@ class StringUtil {
   }
 
   static String toSnakeCase(String str) {
-    return str.replaceAll(RegExp(r'([A-Z])'), '_\1').toLowerCase().replaceAll(RegExp(r'-|_'), '_');
+    return str
+        .replaceAll(RegExp(r'([A-Z])'), '_1')
+        .toLowerCase()
+        .replaceAll(RegExp(r'-|_'), '_');
   }
 
   static String toPascalCase(String str) {

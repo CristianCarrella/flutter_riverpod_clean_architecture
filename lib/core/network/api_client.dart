@@ -17,7 +17,10 @@ class ApiClient {
         baseUrl: AppConstants.apiBaseUrl,
         connectTimeout: AppConstants.connectTimeout,
         receiveTimeout: AppConstants.receiveTimeout,
-        headers: {"Content-Type": "application/json", "Accept": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
       ),
     );
 
@@ -62,9 +65,15 @@ class ApiClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return ApiException(message: "Timeout connessione server", code: "TIMEOUT");
+        return ApiException(
+          message: "Timeout connessione server",
+          code: "TIMEOUT",
+        );
       case DioExceptionType.connectionError:
-        return ApiException(message: "Nessuna connessione internet", code: "NO_CONNECTION");
+        return ApiException(
+          message: "Nessuna connessione internet",
+          code: "NO_CONNECTION",
+        );
       case DioExceptionType.badResponse:
         return _parseErrorResponse(error);
       case DioExceptionType.cancel:
@@ -102,7 +111,11 @@ class ApiClient {
     CancelToken? cancelToken,
   }) async {
     return _performApiCall(
-      () => _dio.get(path, queryParameters: queryParameters, cancelToken: cancelToken),
+      () => _dio.get(
+        path,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+      ),
       fromJson,
     );
   }
@@ -119,7 +132,10 @@ class ApiClient {
         path,
         data: isMultipart && data is! FormData ? FormData.fromMap(data) : data,
         cancelToken: cancelToken,
-        options: isMultipart ? Options(headers: {"Content-Type": "multipart/form-data"}) : null,
+        options:
+            isMultipart
+                ? Options(headers: {"Content-Type": "multipart/form-data"})
+                : null,
       ),
       fromJson,
     );
@@ -131,7 +147,10 @@ class ApiClient {
     dynamic data,
     CancelToken? cancelToken,
   }) async {
-    return _performApiCall(() => _dio.put(path, data: data, cancelToken: cancelToken), fromJson);
+    return _performApiCall(
+      () => _dio.put(path, data: data, cancelToken: cancelToken),
+      fromJson,
+    );
   }
 
   Future<T> patch<T>(
@@ -140,7 +159,10 @@ class ApiClient {
     dynamic data,
     CancelToken? cancelToken,
   }) async {
-    return _performApiCall(() => _dio.patch(path, data: data, cancelToken: cancelToken), fromJson);
+    return _performApiCall(
+      () => _dio.patch(path, data: data, cancelToken: cancelToken),
+      fromJson,
+    );
   }
 
   Future<T> delete<T>(
@@ -149,7 +171,10 @@ class ApiClient {
     dynamic data,
     CancelToken? cancelToken,
   }) async {
-    return _performApiCall(() => _dio.delete(path, data: data, cancelToken: cancelToken), fromJson);
+    return _performApiCall(
+      () => _dio.delete(path, data: data, cancelToken: cancelToken),
+      fromJson,
+    );
   }
 }
 

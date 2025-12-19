@@ -1,24 +1,20 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_riverpod_clean_architecture/core/error/exceptions.dart';
+import 'package:flutter_riverpod_clean_architecture/core/resource/exceptions.dart';
 
 class SecureStorageService {
   final FlutterSecureStorage _secureStorage;
 
   SecureStorageService(this._secureStorage);
 
-  // Default constructor
   factory SecureStorageService.create() {
-    return SecureStorageService(const FlutterSecureStorage(
-      aOptions: AndroidOptions(
-        encryptedSharedPreferences: true,
+    return SecureStorageService(
+      const FlutterSecureStorage(
+        aOptions: AndroidOptions(encryptedSharedPreferences: true),
+        iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
       ),
-      iOptions: IOSOptions(
-        accessibility: KeychainAccessibility.first_unlock,
-      ),
-    ));
+    );
   }
 
-  // Write value
   Future<void> write({required String key, required String value}) async {
     try {
       await _secureStorage.write(key: key, value: value);
@@ -27,7 +23,6 @@ class SecureStorageService {
     }
   }
 
-  // Read value
   Future<String?> read({required String key}) async {
     try {
       return await _secureStorage.read(key: key);
@@ -36,7 +31,6 @@ class SecureStorageService {
     }
   }
 
-  // Delete value
   Future<void> delete({required String key}) async {
     try {
       await _secureStorage.delete(key: key);
@@ -45,7 +39,6 @@ class SecureStorageService {
     }
   }
 
-  // Delete all
   Future<void> deleteAll() async {
     try {
       await _secureStorage.deleteAll();
@@ -54,7 +47,6 @@ class SecureStorageService {
     }
   }
 
-  // Check if key exists
   Future<bool> containsKey({required String key}) async {
     try {
       return await _secureStorage.containsKey(key: key);
@@ -63,7 +55,6 @@ class SecureStorageService {
     }
   }
 
-  // Read all values
   Future<Map<String, String>> readAll() async {
     try {
       return await _secureStorage.readAll();

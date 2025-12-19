@@ -1,4 +1,4 @@
-import '../error/exceptions.dart';
+import 'exceptions.dart';
 
 sealed class Resource<T> {
   final T? data;
@@ -14,13 +14,18 @@ sealed class Resource<T> {
   }) {
     return switch (this) {
       Success(data: final d) => onSuccess?.call(d as T),
-      Failure(message: final m, errorData: final e) => onFailure?.call(m ?? "Unknown", e),
+      Failure(message: final m, errorData: final e) => onFailure?.call(
+        m ?? "Unknown",
+        e,
+      ),
       Loading() => onLoading?.call(),
       Idle() => onIdle?.call(),
     };
   }
 
-  static Future<Resource<T>> executeAndReturnResource<T>(Future<T> Function() function) async {
+  static Future<Resource<T>> executeAndReturnResource<T>(
+    Future<T> Function() function,
+  ) async {
     try {
       var result = await function();
       return Success(data: result);
@@ -68,5 +73,6 @@ class Idle<T> extends Resource<T> {
 class Failure<T> extends Resource<T> {
   final dynamic errorData;
 
-  const Failure({required String message, this.errorData}) : super(message: message);
+  const Failure({required String message, this.errorData})
+    : super(message: message);
 }

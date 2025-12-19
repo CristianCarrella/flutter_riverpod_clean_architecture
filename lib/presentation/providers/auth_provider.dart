@@ -20,7 +20,12 @@ class AuthState {
     this.errorMessage,
   });
 
-  AuthState copyWith({bool? isAuthenticated, bool? isLoading, User? user, String? errorMessage}) {
+  AuthState copyWith({
+    bool? isAuthenticated,
+    bool? isLoading,
+    User? user,
+    String? errorMessage,
+  }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isLoading: isLoading ?? this.isLoading,
@@ -55,7 +60,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    final Resource<User> result = await _loginUseCase.execute(email: email, password: password);
+    final Resource<User> result = await _loginUseCase.execute(
+      email: email,
+      password: password,
+    );
 
     result.foldOrNull(
       onFailure:
@@ -84,7 +92,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    final result = await _registerUseCase.execute(name: name, email: email, password: password);
+    final result = await _registerUseCase.execute(
+      name: name,
+      email: email,
+      password: password,
+    );
 
     result.foldOrNull(
       onFailure:
@@ -112,7 +124,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final result = await _logoutUseCase.execute();
 
     result.foldOrNull(
-      onFailure: (message, _) => state = state.copyWith(isLoading: false, errorMessage: message),
+      onFailure:
+          (message, _) =>
+              state = state.copyWith(isLoading: false, errorMessage: message),
       onSuccess:
           (_) =>
               state = state.copyWith(
@@ -124,16 +138,3 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 }
-
-// Auth provider
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  final loginUseCase = ref.watch(loginUseCaseProvider);
-  final logoutUseCase = ref.watch(logoutUseCaseProvider);
-  final registerUseCase = ref.watch(registerUseCaseProvider);
-
-  return AuthNotifier(
-    loginUseCase: loginUseCase,
-    logoutUseCase: logoutUseCase,
-    registerUseCase: registerUseCase,
-  );
-});

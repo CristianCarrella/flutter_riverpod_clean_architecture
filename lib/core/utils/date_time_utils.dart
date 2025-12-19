@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
 
-class DateTimeUtil {
+class DateTimeUtils {
+  DateTimeUtils._();
+
   static const String dateFormat = 'dd/MM/yyyy';
   static const String timeFormat = 'HH:mm:ss';
   static const String dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
@@ -21,8 +23,10 @@ class DateTimeUtil {
     return DateFormat(format).format(dateTime);
   }
 
-  static String formatDateTime(DateTime dateTime,
-      {String format = dateTimeFormat}) {
+  static String formatDateTime(
+    DateTime dateTime, {
+    String format = dateTimeFormat,
+  }) {
     return DateFormat(format).format(dateTime);
   }
 
@@ -42,7 +46,10 @@ class DateTimeUtil {
     return DateFormat('EEEE', locale).format(date);
   }
 
-  static DateTime? tryParse(String dateString, {String format = dateTimeFormat}) {
+  static DateTime? tryParse(
+    String dateString, {
+    String format = dateTimeFormat,
+  }) {
     try {
       return DateFormat(format).parse(dateString);
     } catch (e) {
@@ -130,8 +137,11 @@ class DateTimeUtil {
   }
 
   static DateTime lastDayOfMonth(DateTime date) {
-    return DateTime(date.year, date.month,
-        _getLastDayOfMonth(date.year, date.month));
+    return DateTime(
+      date.year,
+      date.month,
+      _getLastDayOfMonth(date.year, date.month),
+    );
   }
 
   static DateTime firstDayOfWeek(DateTime date) {
@@ -184,8 +194,11 @@ class DateTimeUtil {
     return DateTime(year, month + 1, 0).day;
   }
 
-  static String _formatTimeDiff(Duration duration, String locale,
-      {required bool past}) {
+  static String _formatTimeDiff(
+    Duration duration,
+    String locale, {
+    required bool past,
+  }) {
     final days = duration.inDays;
     final hours = duration.inHours.remainder(24);
     final minutes = duration.inMinutes.remainder(60);

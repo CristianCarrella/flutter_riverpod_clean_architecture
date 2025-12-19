@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/models/team.dart';
 
 import '../../dtos/team_dto.dart';
@@ -35,7 +34,3 @@ class TeamsDataSourceLocalImpl implements TeamsDataSource {
     return teams.map((e) => e.toTeam()).toList();
   }
 }
-
-final teamsDataSourceProvider = Provider<TeamsDataSourceLocalImpl>((ref) {
-  return TeamsDataSourceLocalImpl();
-});

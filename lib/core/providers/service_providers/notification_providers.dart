@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod_clean_architecture/core/analytics/analytics_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/analytics_providers.dart';
 import 'package:flutter_riverpod_clean_architecture/core/notifications/debug_notification_service.dart';
 import 'package:flutter_riverpod_clean_architecture/core/notifications/notification_service.dart';
 
@@ -45,9 +45,7 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 
   // Dispose the service when the provider is disposed
   ref.onDispose(() {
-    if (service is DebugNotificationService) {
-      service.dispose();
-    }
+    service.dispose();
   });
 
   return service;

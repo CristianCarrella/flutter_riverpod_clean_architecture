@@ -1,10 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod_clean_architecture/core/constants/app_constants.dart';
-import 'package:flutter_riverpod_clean_architecture/core/network/api_client.dart';
-import 'package:flutter_riverpod_clean_architecture/core/providers/storage_providers.dart';
 import 'package:flutter_riverpod_clean_architecture/core/storage/local_storage_service.dart';
 import 'package:flutter_riverpod_clean_architecture/core/storage/secure_storage_service.dart';
-import 'package:flutter_riverpod_clean_architecture/data/datasources/datasources_impl/auth_remote_data_source.dart';
 import 'package:flutter_riverpod_clean_architecture/data/dtos/user_dto.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/models/user.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/repositories/auth_repository.dart';
@@ -27,11 +23,23 @@ class AuthRepositoryImpl implements AuthRepository {
        _secureStorageService = secureStorageService;
 
   @override
-  Future<Resource<User>> login({required String email, required String password}) async {
+  Future<Resource<User>> login({
+    required String email,
+    required String password,
+  }) async {
     return Resource.executeAndReturnResource(() async {
-      final User user = await _remoteDataSource.login(email: email, password: password);
-      await _localStorageService.setObject(AppConstants.userDataKey, user.toJson());
-      await _secureStorageService.write(key: AppConstants.tokenKey, value: user.id);
+      final User user = await _remoteDataSource.login(
+        email: email,
+        password: password,
+      );
+      await _localStorageService.setObject(
+        AppConstants.userDataKey,
+        user.toJson(),
+      );
+      await _secureStorageService.write(
+        key: AppConstants.tokenKey,
+        value: user.id,
+      );
 
       return user;
     });
@@ -44,9 +52,19 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     return Resource.executeAndReturnResource(() async {
-      final user = await _remoteDataSource.register(name: name, email: email, password: password);
-      await _localStorageService.setObject(AppConstants.userDataKey, user.toJson());
-      await _secureStorageService.write(key: AppConstants.tokenKey, value: user.id);
+      final user = await _remoteDataSource.register(
+        name: name,
+        email: email,
+        password: password,
+      );
+      await _localStorageService.setObject(
+        AppConstants.userDataKey,
+        user.toJson(),
+      );
+      await _secureStorageService.write(
+        key: AppConstants.tokenKey,
+        value: user.id,
+      );
 
       return user;
     });
@@ -63,7 +81,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Resource<bool>> isAuthenticated() async {
     return Resource.executeAndReturnResource(() async {
-      final token = await _secureStorageService.read(key: AppConstants.tokenKey);
+      final token = await _secureStorageService.read(
+        key: AppConstants.tokenKey,
+      );
       return token != null && token.isNotEmpty;
     });
   }
@@ -77,22 +97,3 @@ class AuthRepositoryImpl implements AuthRepository {
     });
   }
 }
-
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
-
-final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return LocalStorageService(prefs);
-});
-
-final secureStorageServiceProvider = Provider<SecureStorageService>((ref) {
-  return SecureStorageService.create();
-});
-
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl(
-    remoteDataSource: ref.watch(authRemoteDataSourceProvider),
-    localStorageService: ref.watch(localStorageServiceProvider),
-    secureStorageService: ref.watch(secureStorageServiceProvider),
-  );
-});

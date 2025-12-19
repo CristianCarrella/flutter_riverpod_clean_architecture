@@ -4,7 +4,10 @@ import '../../core/resource/resource.dart';
 
 abstract class AuthRepository {
   /// Login a user with email and password
-  Future<Resource<User>> login({required String email, required String password});
+  Future<Resource<User>> login({
+    required String email,
+    required String password,
+  });
 
   /// Register a new user
   Future<Resource<User>> register({

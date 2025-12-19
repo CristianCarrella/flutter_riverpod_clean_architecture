@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod_clean_architecture/core/resource/resource.dart';
 
-
 /// Base interface for all use cases
-/// 
+///
 /// [T] - The return type of the use case
 /// [Params] - The parameters required by the use case
 abstract class UseCase<T, Params> {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-enum ToastType { error, info, warning, success }
+enum DialogType { error, info, warning, success, none }
 
 class CustomToast {
   static void show(
     BuildContext context, {
-    required String message,
-    ToastType type = ToastType.info,
+    String? message,
+    DialogType type = DialogType.info,
     Duration duration = const Duration(seconds: 3),
   }) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -25,7 +25,11 @@ class CustomToast {
             color: theme.color,
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
             ],
           ),
           child: Row(
@@ -33,16 +37,17 @@ class CustomToast {
             children: [
               Icon(theme.icon, color: Colors.white, size: 24),
               const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  message,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+              if (message != null)
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -51,16 +56,16 @@ class CustomToast {
   }
 
   static void error(BuildContext context, String message) =>
-      show(context, message: message, type: ToastType.error);
+      show(context, message: message, type: DialogType.error);
 
   static void success(BuildContext context, String message) =>
-      show(context, message: message, type: ToastType.success);
+      show(context, message: message, type: DialogType.success);
 
   static void info(BuildContext context, String message) =>
-      show(context, message: message, type: ToastType.info);
+      show(context, message: message, type: DialogType.info);
 
   static void warning(BuildContext context, String message) =>
-      show(context, message: message, type: ToastType.warning);
+      show(context, message: message, type: DialogType.warning);
 }
 
 class _ToastTheme {
@@ -69,16 +74,18 @@ class _ToastTheme {
 
   _ToastTheme(this.color, this.icon);
 
-  static _ToastTheme fromType(ToastType type) {
+  static _ToastTheme fromType(DialogType type) {
     switch (type) {
-      case ToastType.error:
+      case DialogType.error:
         return _ToastTheme(Colors.redAccent, Icons.error_outline);
-      case ToastType.info:
+      case DialogType.info:
         return _ToastTheme(Colors.blueAccent, Icons.info_outline);
-      case ToastType.warning:
+      case DialogType.warning:
         return _ToastTheme(Colors.orangeAccent, Icons.warning_amber_rounded);
-      case ToastType.success:
+      case DialogType.success:
         return _ToastTheme(Colors.green, Icons.check_circle_outline);
+      case DialogType.none:
+        return _ToastTheme(Colors.transparent, Icons.info_outline);
     }
   }
 }

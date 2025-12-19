@@ -1,8 +1,9 @@
 /// Flutter Riverpod Clean Architecture Feature Generator
-/// 
+///
 /// This Dart file can be used programmatically to generate new features
 /// It mirrors the functionality of the generate_feature.sh script
 /// but allows for more complex integration with IDE plugins or Flutter tools.
+library;
 
 import 'dart:io';
 
@@ -11,10 +12,10 @@ class FeatureGenerator {
   final bool withUi;
   final bool withTests;
   final bool withDocs;
-  
+
   /// Feature name in PascalCase (e.g., UserProfile)
   late final String pascalCase;
-  
+
   /// Feature name in camelCase (e.g., userProfile)
   late final String camelCase;
 
@@ -31,37 +32,37 @@ class FeatureGenerator {
   /// Generate all files and folders for the feature
   Future<void> generate() async {
     print('Generating feature: $featureName');
-    
+
     await _createDirectories();
     await _createFiles();
-    
+
     print('Feature $featureName generated successfully!');
   }
 
   /// Create the directory structure for the feature
   Future<void> _createDirectories() async {
     final baseDir = 'lib/features/$featureName';
-    
+
     // Data layer
     await _createDir('$baseDir/data/datasources');
     await _createDir('$baseDir/data/models');
     await _createDir('$baseDir/data/repositories');
-    
+
     // Domain layer
     await _createDir('$baseDir/domain/entities');
     await _createDir('$baseDir/domain/repositories');
     await _createDir('$baseDir/domain/usecases');
-    
+
     // Presentation layer (if enabled)
     if (withUi) {
       await _createDir('$baseDir/presentation/providers');
       await _createDir('$baseDir/presentation/screens');
       await _createDir('$baseDir/presentation/widgets');
     }
-    
+
     // Providers folder
     await _createDir('$baseDir/providers');
-    
+
     // Test directories (if enabled)
     if (withTests) {
       await _createDir('test/features/$featureName/data');
@@ -70,7 +71,7 @@ class FeatureGenerator {
         await _createDir('test/features/$featureName/presentation');
       }
     }
-    
+
     // Documentation (if enabled)
     if (withDocs) {
       await _createDir('docs/features');
@@ -80,11 +81,9 @@ class FeatureGenerator {
   /// Create all template files for the feature
   Future<void> _createFiles() async {
     final baseDir = 'lib/features/$featureName';
-    
+
     // Data Layer Files
-    await _createFile(
-      '$baseDir/data/models/${featureName}_model.dart',
-      '''
+    await _createFile('$baseDir/data/models/${featureName}_model.dart', '''
 // $pascalCase Model
 // Implements the ${pascalCase}Entity with additional data layer functionality
 
@@ -164,7 +163,8 @@ class ${pascalCase}RemoteDataSourceImpl implements ${pascalCase}RemoteDataSource
     throw UnimplementedError();
   }
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/data/datasources/${featureName}_local_datasource.dart',
@@ -202,7 +202,8 @@ class ${pascalCase}LocalDataSourceImpl implements ${pascalCase}LocalDataSource {
     throw UnimplementedError();
   }
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/data/repositories/${featureName}_repository_impl.dart',
@@ -258,12 +259,11 @@ class ${pascalCase}RepositoryImpl implements ${pascalCase}Repository {
     throw UnimplementedError();
   }
 }
-''');
+''',
+    );
 
     // Domain Layer Files
-    await _createFile(
-      '$baseDir/domain/entities/${featureName}_entity.dart',
-      '''
+    await _createFile('$baseDir/domain/entities/${featureName}_entity.dart', '''
 // $pascalCase Entity
 // Core business entity, independent of data sources
 
@@ -305,7 +305,8 @@ abstract class ${pascalCase}Repository {
   /// Returns [Failure] or [${pascalCase}Entity]
   Future<Either<Failure, ${pascalCase}Entity>> get${pascalCase}ById(String id);
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/domain/usecases/get_all_${featureName}s.dart',
@@ -330,7 +331,8 @@ class GetAll${pascalCase}s implements UseCase<List<${pascalCase}Entity>, NoParam
     return repository.getAll${pascalCase}s();
   }
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/domain/usecases/get_${featureName}_by_id.dart',
@@ -365,17 +367,16 @@ class ${pascalCase}Params extends Equatable {
   @override
   List<Object> get props => [id];
 }
-''');
+''',
+    );
 
     // Add UI files if requested
     if (withUi) {
       await _createUiFiles(baseDir);
     }
-    
+
     // Provider Files
-    await _createFile(
-      '$baseDir/providers/${featureName}_providers.dart',
-      '''
+    await _createFile('$baseDir/providers/${featureName}_providers.dart', '''
 // $pascalCase Providers
 // Riverpod providers for the $featureName feature
 
@@ -445,7 +446,7 @@ final selected${pascalCase}Provider = FutureProvider<${pascalCase}Entity?>((ref)
   
   return result.fold(
     (failure) => throw Exception(failure.toString()),
-    (${camelCase}) => ${camelCase},
+    ($camelCase) => $camelCase,
   );
 });
 ''');
@@ -490,7 +491,7 @@ class ${pascalCase}ListScreen extends ConsumerWidget {
         data: (${camelCase}s) => ListView.builder(
           itemCount: ${camelCase}s.length,
           itemBuilder: (context, index) => ${pascalCase}ListItem(
-            ${camelCase}: ${camelCase}s[index],
+            $camelCase: ${camelCase}s[index],
             onTap: () {
               ref.read(selected${pascalCase}IdProvider.notifier).state = ${camelCase}s[index].id;
               // Navigate to detail screen
@@ -511,7 +512,8 @@ class ${pascalCase}ListScreen extends ConsumerWidget {
     );
   }
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/presentation/screens/${featureName}_detail_screen.dart',
@@ -536,8 +538,8 @@ class ${pascalCase}DetailScreen extends ConsumerWidget {
         title: const Text('$pascalCase Details'),
       ),
       body: ${camelCase}Async.when(
-        data: (${camelCase}) {
-          if (${camelCase} == null) {
+        data: ($camelCase) {
+          if ($camelCase == null) {
             return const Center(child: Text('$pascalCase not found'));
           }
           
@@ -546,7 +548,7 @@ class ${pascalCase}DetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('ID: \${${camelCase}.id}', style: Theme.of(context).textTheme.headlineSmall),
+                Text('ID: \${$camelCase.id}', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 16),
                 // Add more fields here
               ],
@@ -561,7 +563,8 @@ class ${pascalCase}DetailScreen extends ConsumerWidget {
     );
   }
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/presentation/widgets/${featureName}_list_item.dart',
@@ -574,12 +577,12 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/${featureName}_entity.dart';
 
 class ${pascalCase}ListItem extends StatelessWidget {
-  final ${pascalCase}Entity ${camelCase};
+  final ${pascalCase}Entity $camelCase;
   final VoidCallback onTap;
   
   const ${pascalCase}ListItem({
     Key? key,
-    required this.${camelCase},
+    required this.$camelCase,
     required this.onTap,
   }) : super(key: key);
 
@@ -588,7 +591,7 @@ class ${pascalCase}ListItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
-        title: Text('$pascalCase \${${camelCase}.id}'),
+        title: Text('$pascalCase \${$camelCase.id}'),
         // Add more details here
         trailing: const Icon(Icons.arrow_forward_ios),
         onTap: onTap,
@@ -596,7 +599,8 @@ class ${pascalCase}ListItem extends StatelessWidget {
     );
   }
 }
-''');
+''',
+    );
 
     await _createFile(
       '$baseDir/presentation/providers/${featureName}_ui_providers.dart',
@@ -612,7 +616,8 @@ final ${camelCase}FilterProvider = StateProvider<String>((ref) => '');
 final ${camelCase}SortOrderProvider = StateProvider<SortOrder>((ref) => SortOrder.asc);
 
 enum SortOrder { asc, desc }
-''');
+''',
+    );
   }
 
   /// Create test files
@@ -645,10 +650,14 @@ enum SortOrder { asc, desc }
 
   /// Convert snake_case to PascalCase
   String _toPascalCase(String input) {
-    return input.split('_')
-        .map((word) => word.isEmpty 
-            ? '' 
-            : word[0].toUpperCase() + word.substring(1).toLowerCase())
+    return input
+        .split('_')
+        .map(
+          (word) =>
+              word.isEmpty
+                  ? ''
+                  : word[0].toUpperCase() + word.substring(1).toLowerCase(),
+        )
         .join('');
   }
 
@@ -666,7 +675,7 @@ void main(List<String> args) {
     print('Please provide a feature name in snake_case format.');
     return;
   }
-  
+
   final generator = FeatureGenerator(featureName: args.first);
   generator.generate();
 }

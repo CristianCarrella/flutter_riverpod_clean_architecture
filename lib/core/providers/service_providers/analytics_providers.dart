@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod_clean_architecture/core/analytics/analytics_event.dart';
 import 'package:flutter_riverpod_clean_architecture/core/analytics/analytics_service.dart';
 import 'package:flutter_riverpod_clean_architecture/core/analytics/firebase_analytics_service.dart';
-import 'package:flutter_riverpod_clean_architecture/core/feature_flags/feature_flag_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/feature_flag_providers.dart';
 
 /// A debug analytics service for development
 class DebugAnalyticsService implements AnalyticsService {
@@ -194,11 +194,11 @@ class AnalyticsScreenView extends StatefulWidget {
   final Widget child;
 
   const AnalyticsScreenView({
-    Key? key,
+    super.key,
     required this.screenName,
     this.parameters,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<AnalyticsScreenView> createState() => _AnalyticsScreenViewState();

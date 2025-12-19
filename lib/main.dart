@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod_clean_architecture/core/accessibility/accessibility_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/accessibility_providers.dart';
 import 'package:flutter_riverpod_clean_architecture/core/constants/app_constants.dart';
-import 'package:flutter_riverpod_clean_architecture/core/providers/localization_providers.dart';
-import 'package:flutter_riverpod_clean_architecture/core/providers/storage_providers.dart';
-import 'package:flutter_riverpod_clean_architecture/core/router/app_router.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/localization_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/storage_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/app_router_providers.dart';
 import 'package:flutter_riverpod_clean_architecture/core/theme/app_theme.dart';
 import 'package:flutter_riverpod_clean_architecture/core/localizations/app_localizations_delegate.dart';
 import 'package:flutter_riverpod_clean_architecture/core/localizations/l10n.dart';
@@ -26,7 +26,9 @@ void main() async {
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
 
         // Override the default locale provider to use our persistent locale
-        defaultLocaleProvider.overrideWith((ref) => ref.watch(persistentLocaleProvider)),
+        defaultLocaleProvider.overrideWith(
+          (ref) => ref.watch(persistentLocaleProvider),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -60,7 +62,6 @@ class MyApp extends ConsumerWidget {
         themeMode: themeMode,
         routerConfig: router,
         debugShowCheckedModeBanner: false,
-
         locale: locale,
         localizationsDelegates: [
           AppLocalizations.delegate,

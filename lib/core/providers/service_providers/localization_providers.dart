@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod_clean_architecture/core/providers/storage_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/storage_providers.dart';
 import 'package:flutter_riverpod_clean_architecture/core/localizations/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Key for storing selected language code in SharedPreferences
 const _languageCodeKey = 'selected_language_code';
 
-
-/// Provider for persisting and retrieving the user's locale preference
 final savedLocaleProvider = Provider<Locale>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   final savedLanguageCode = prefs.getString(_languageCodeKey);
@@ -20,7 +17,6 @@ final savedLocaleProvider = Provider<Locale>((ref) {
     return Locale(savedLanguageCode);
   }
 
-  // Default to system locale or English if system locale is not supported
   final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
   if (AppLocalizations.isSupported(systemLocale)) {
     return systemLocale;
@@ -29,7 +25,6 @@ final savedLocaleProvider = Provider<Locale>((ref) {
   return const Locale('en');
 });
 
-/// Provider for initializing and persisting the locale notifier
 final persistentLocaleProvider =
     StateNotifierProvider<PersistentLocaleNotifier, Locale>((ref) {
       final prefs = ref.watch(sharedPreferencesProvider);
@@ -38,14 +33,12 @@ final persistentLocaleProvider =
       return PersistentLocaleNotifier(prefs, initialLocale);
     });
 
-/// Notifier for managing the locale state with persistence
 class PersistentLocaleNotifier extends StateNotifier<Locale> {
   PersistentLocaleNotifier(this._prefs, Locale initialLocale)
     : super(initialLocale);
 
   final SharedPreferences _prefs;
 
-  /// Set a new locale and persist the choice
   Future<void> setLocale(Locale locale) async {
     if (AppLocalizations.isSupported(locale)) {
       await _prefs.setString(_languageCodeKey, locale.languageCode);
@@ -53,7 +46,6 @@ class PersistentLocaleNotifier extends StateNotifier<Locale> {
     }
   }
 
-  /// Reset to the system locale
   Future<void> resetToSystemLocale() async {
     await _prefs.remove(_languageCodeKey);
     final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;

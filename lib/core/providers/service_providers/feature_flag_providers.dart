@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod_clean_architecture/core/analytics/analytics_providers.dart';
+import 'package:flutter_riverpod_clean_architecture/core/providers/service_providers/analytics_providers.dart';
 import 'package:flutter_riverpod_clean_architecture/core/feature_flags/feature_flag_service.dart';
 import 'package:flutter_riverpod_clean_architecture/core/feature_flags/local_feature_flag_service.dart';
 import 'package:flutter_riverpod_clean_architecture/core/feature_flags/remote_feature_flag_service.dart';
@@ -131,12 +131,12 @@ class FeatureFlag extends ConsumerWidget {
   final Widget? fallback;
 
   const FeatureFlag({
-    Key? key,
+    super.key,
     required this.featureKey,
     this.defaultValue = false,
     required this.child,
     this.fallback,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

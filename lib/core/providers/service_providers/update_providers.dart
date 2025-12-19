@@ -90,11 +90,11 @@ class UpdateChecker extends ConsumerWidget {
 
   /// Create an update checker
   const UpdateChecker({
-    Key? key,
+    super.key,
     required this.child,
     this.autoPrompt = true,
     this.enforceCriticalUpdates = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
