@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod_clean_architecture/core/resource/resource.dart';
+import 'package:flutter_riverpod_clean_architecture/core/error_handling/resource.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/models/user.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/repositories/auth_repository.dart';
 

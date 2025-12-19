@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod_clean_architecture/domain/models/user.dart';
 
-import '../../core/resource/resource.dart';
+import '../../core/error_handling/resource.dart';
 
 abstract class AuthRepository {
   /// Login a user with email and password

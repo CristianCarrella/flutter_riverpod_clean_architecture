@@ -1,4 +1,5 @@
-import 'package:flutter_riverpod_clean_architecture/core/resource/resource.dart';
+
+import '../error_handling/resource.dart';
 
 /// Base interface for all use cases
 ///

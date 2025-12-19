@@ -1,6 +1,6 @@
 // Auth state
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod_clean_architecture/core/resource/resource.dart';
+import 'package:flutter_riverpod_clean_architecture/core/error_handling/resource.dart';
 
 import '../../domain/models/user.dart';
 import '../../domain/usecases/login_use_case.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod_clean_architecture/domain/repositories/auth_repository.dart';
 
-import '../../core/resource/resource.dart';
+import '../../core/error_handling/resource.dart';
 
 class LogoutUseCase {
   final AuthRepository _repository;

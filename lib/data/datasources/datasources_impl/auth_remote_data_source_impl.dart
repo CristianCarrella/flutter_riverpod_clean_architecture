@@ -1,10 +1,11 @@
-import 'package:flutter_riverpod_clean_architecture/core/resource/exceptions.dart';
 import 'package:flutter_riverpod_clean_architecture/core/network/api_client.dart';
 import 'package:flutter_riverpod_clean_architecture/core/utils/app_utils.dart';
 import 'package:flutter_riverpod_clean_architecture/data/datasources/auth_data_source.dart';
 import 'package:flutter_riverpod_clean_architecture/data/dtos/user_dto.dart';
 import 'package:flutter_riverpod_clean_architecture/data/mappers/user_mapper.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/models/user.dart';
+
+import '../../../core/error_handling/exceptions.dart';
 
 class AuthRemoteDataSourceImpl implements AuthDataSource {
   final ApiClient _apiClient;

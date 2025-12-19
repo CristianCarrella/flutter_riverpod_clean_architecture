@@ -5,7 +5,7 @@ import 'package:flutter_riverpod_clean_architecture/data/dtos/user_dto.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/models/user.dart';
 import 'package:flutter_riverpod_clean_architecture/domain/repositories/auth_repository.dart';
 
-import '../../core/resource/resource.dart';
+import '../../core/error_handling/resource.dart';
 import '../datasources/auth_data_source.dart';
 import '../mappers/user_mapper.dart';
 
