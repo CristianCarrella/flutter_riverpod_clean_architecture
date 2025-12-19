@@ -186,7 +186,7 @@ class _AdvancedImageState extends ConsumerState<AdvancedImage> {
           ),
           Positioned.fill(
             child: Container(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               child: const Center(child: CircularProgressIndicator()),
             ),
           ),
@@ -206,7 +206,7 @@ class _AdvancedImageState extends ConsumerState<AdvancedImage> {
             Container(
               width: widget.width,
               height: widget.height,
-              color: Colors.red.withOpacity(0.1),
+              color: Colors.red.withValues(alpha: 0.1),
               child: const Center(
                 child: Icon(Icons.broken_image, color: Colors.red),
               ),

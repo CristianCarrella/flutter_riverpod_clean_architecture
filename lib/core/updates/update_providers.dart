@@ -146,10 +146,10 @@ class UpdateDialog extends ConsumerWidget {
 
   /// Create an update dialog
   const UpdateDialog({
-    Key? key,
+    super.key,
     required this.updateInfo,
     this.isCritical = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

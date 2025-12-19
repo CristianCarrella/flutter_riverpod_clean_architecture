@@ -112,7 +112,7 @@ class LocalStorageService {
   dynamic getObject(String key) {
     try {
       final String? jsonString = _prefs.getString(key);
-      if (jsonString == null) return null;
+      if (jsonString == null) return throw CacheException(message: 'Data not found');
       return json.decode(jsonString);
     } catch (e) {
       throw CacheException(message: 'Failed to retrieve data: $e');

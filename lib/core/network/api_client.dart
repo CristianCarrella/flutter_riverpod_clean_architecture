@@ -1,115 +1,164 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod_clean_architecture/core/constants/app_constants.dart';
-import 'package:flutter_riverpod_clean_architecture/core/error/exceptions.dart';
+import 'package:flutter/foundation.dart';
+
+import '../constants/app_constants.dart';
+
+typedef TokenProvider = Future<String?> Function();
 
 class ApiClient {
-  final Dio _dio;
+  late final Dio _dio;
+  final TokenProvider? _tokenProvider;
 
-  ApiClient() : _dio = Dio() {
-    _dio.options.baseUrl = AppConstants.apiBaseUrl;
-    _dio.options.connectTimeout = const Duration(milliseconds: 30000);
-    _dio.options.receiveTimeout = const Duration(milliseconds: 30000);
-    _dio.options.headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
+  ApiClient({TokenProvider? tokenProvider}) : _tokenProvider = tokenProvider {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: AppConstants.apiBaseUrl,
+        connectTimeout: AppConstants.connectTimeout,
+        receiveTimeout: AppConstants.receiveTimeout,
+        headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      ),
+    );
 
-    // Add interceptors for logging
-    _dio.interceptors.add(LogInterceptor(
-      request: true,
-      requestHeader: true,
-      requestBody: true,
-      responseHeader: true,
-      responseBody: true,
-      error: true,
-    ));
+    _dio.interceptors.add(LogInterceptor());
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          if (_tokenProvider != null) {
+            final token = await _tokenProvider();
+            if (token != null && token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
+          }
+          return handler.next(options);
+        },
+      ),
+    );
   }
 
-  // GET request
-  Future<dynamic> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<T> _performApiCall<T>(
+    Future<Response> Function() apiCall,
+    T Function(dynamic json) parser,
+  ) async {
     try {
-      final response = await _dio.get(path, queryParameters: queryParameters);
-      return response.data;
-    } on DioException catch (e) {
-      _handleError(e);
+      final response = await apiCall();
+
+      if (response.data is Map || response.data is List) {
+        return await compute(parser, response.data);
+      } else {
+        return parser(response.data);
+      }
+    } on DioException catch (error) {
+      throw _handleDioError(error);
+    } catch (error) {
+      throw ApiException(message: error.toString(), code: "GENERIC");
     }
   }
 
-  // POST request
-  Future<dynamic> post(String path, {dynamic data}) async {
-    try {
-      final response = await _dio.post(path, data: data);
-      return response.data;
-    } on DioException catch (e) {
-      _handleError(e);
-    }
-  }
-
-  // PUT request
-  Future<dynamic> put(String path, {dynamic data}) async {
-    try {
-      final response = await _dio.put(path, data: data);
-      return response.data;
-    } on DioException catch (e) {
-      _handleError(e);
-    }
-  }
-
-  // DELETE request
-  Future<dynamic> delete(String path) async {
-    try {
-      final response = await _dio.delete(path);
-      return response.data;
-    } on DioException catch (e) {
-      _handleError(e);
-    }
-  }
-
-  // Handle Dio errors
-  void _handleError(DioException e) {
-    switch (e.type) {
+  ApiException _handleDioError(DioException error) {
+    switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        throw TimeoutException();
+        return ApiException(message: "Timeout connessione server", code: "TIMEOUT");
+      case DioExceptionType.connectionError:
+        return ApiException(message: "Nessuna connessione internet", code: "NO_CONNECTION");
       case DioExceptionType.badResponse:
-        switch (e.response?.statusCode) {
-          case 400:
-            throw BadRequestException(message: e.response?.data['message']);
-          case 401:
-            throw UnauthorizedException(message: e.response?.data['message']);
-          case 403:
-            throw ForbiddenException(message: e.response?.data['message']);
-          case 404:
-            throw NotFoundException(message: e.response?.data['message']);
-          case 500:
-          case 501:
-          case 502:
-          case 503:
-            throw ServerException(message: e.response?.data['message']);
-          default:
-            throw ServerException(
-                message: e.response?.data['message'] ?? 'Unknown error occurred');
-        }
+        return _parseErrorResponse(error);
       case DioExceptionType.cancel:
-        throw RequestCancelledException();
-      case DioExceptionType.unknown:
-        if (e.error.toString().contains('SocketException')) {
-          throw NetworkException();
-        }
-        throw ServerException(message: 'Unknown error occurred');
+        return ApiException(message: "Richiesta cancellata", code: "CANCELLED");
       default:
-        throw ServerException(message: 'Unknown error occurred');
+        return ApiException(message: "Errore sconosciuto", code: "UNKNOWN");
     }
   }
 
-  // Add token to headers
-  void setToken(String token) {
-    _dio.options.headers['Authorization'] = 'Bearer $token';
+  ApiException _parseErrorResponse(DioException error) {
+    final statusCode = error.response?.statusCode?.toString() ?? "500";
+    final data = error.response?.data;
+
+    String errorMessage = error.message ?? "Errore generico";
+
+    try {
+      if (data is Map<String, dynamic>) {
+        if (data["content"] is Map) {
+          errorMessage = data["content"]["message"] ?? errorMessage;
+        } else if (data["message"] != null) {
+          errorMessage = data["message"];
+        }
+      } else if (data is String) {
+        errorMessage = data;
+      }
+    } catch (_) {}
+
+    return ApiException(message: errorMessage, code: statusCode);
   }
 
-  // Remove token from headers
-  void removeToken() {
-    _dio.options.headers.remove('Authorization');
+  Future<T> get<T>(
+    String path, {
+    required T Function(dynamic json) fromJson,
+    Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
+  }) async {
+    return _performApiCall(
+      () => _dio.get(path, queryParameters: queryParameters, cancelToken: cancelToken),
+      fromJson,
+    );
   }
+
+  Future<T> post<T>(
+    String path, {
+    required T Function(dynamic json) fromJson,
+    dynamic data,
+    bool isMultipart = false,
+    CancelToken? cancelToken,
+  }) async {
+    return _performApiCall(
+      () => _dio.post(
+        path,
+        data: isMultipart && data is! FormData ? FormData.fromMap(data) : data,
+        cancelToken: cancelToken,
+        options: isMultipart ? Options(headers: {"Content-Type": "multipart/form-data"}) : null,
+      ),
+      fromJson,
+    );
+  }
+
+  Future<T> put<T>(
+    String path, {
+    required T Function(dynamic json) fromJson,
+    dynamic data,
+    CancelToken? cancelToken,
+  }) async {
+    return _performApiCall(() => _dio.put(path, data: data, cancelToken: cancelToken), fromJson);
+  }
+
+  Future<T> patch<T>(
+    String path, {
+    required T Function(dynamic json) fromJson,
+    dynamic data,
+    CancelToken? cancelToken,
+  }) async {
+    return _performApiCall(() => _dio.patch(path, data: data, cancelToken: cancelToken), fromJson);
+  }
+
+  Future<T> delete<T>(
+    String path, {
+    required T Function(dynamic json) fromJson,
+    dynamic data,
+    CancelToken? cancelToken,
+  }) async {
+    return _performApiCall(() => _dio.delete(path, data: data, cancelToken: cancelToken), fromJson);
+  }
+}
+
+class ApiException implements Exception {
+  final String message;
+  final String code;
+
+  ApiException({required this.message, required this.code});
+
+  @override
+  String toString() => message;
 }
